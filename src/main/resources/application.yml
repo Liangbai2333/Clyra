@@ -1,0 +1,5 @@
+langchain4j:
+  dashscope:
+    chat-model:
+      base-url: 66
+      api-key: 666
