@@ -2,7 +2,6 @@ package site.liangbai.clyra.dispatcher;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import site.liangbai.clyra.annotation.CommandParam;
 import site.liangbai.clyra.boot.properties.ClyraProperties;
 import site.liangbai.clyra.bus.CommandBus;
@@ -18,7 +17,6 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 
 @Slf4j
-@Component
 public class CommandDispatcher {
     @Resource
     private ClyraProperties clyraProperties;
@@ -65,15 +63,15 @@ public class CommandDispatcher {
         if (node == null) {
             return DispatchResult.NOT_FOUND_NODE;
         }
-        List<String> args = Arrays.asList(StringUtils.trimStart(StringUtils.removePrefix(argsWithNode, node)).split(" "));
+        List<String> args = new ArrayList<>(Arrays.asList(StringUtils.trimStart(StringUtils.removePrefix(argsWithNode, node)).split(" ")));
         Parameter[] parameters = resolver.getParametersByNode(node);
-        if (args.size() < parameters.length) {
-            throw new IllegalArgumentException("invalid params");
-        }
         List<Object> argsWithOrder = new ArrayList<>();
         Arrays.stream(parameters)
                 .filter(it -> it.isAnnotationPresent(CommandParam.class))
                 .forEach(it -> {
+                    if (args.isEmpty()) {
+                        throw new IllegalArgumentException("Missing argument: " + it.getName());
+                    }
                     Class<?> type = it.getType();
                     argsWithOrder.add(TypeUtils.convertToPrimitiveType(type, args.remove(0)));
                 });

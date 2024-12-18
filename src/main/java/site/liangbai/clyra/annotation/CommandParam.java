@@ -2,7 +2,7 @@ package site.liangbai.clyra.annotation;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.METHOD})
+@Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface CommandParam {

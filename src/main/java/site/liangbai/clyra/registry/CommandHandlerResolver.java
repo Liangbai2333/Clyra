@@ -66,11 +66,12 @@ public class CommandHandlerResolver {
             commandHandlerMap.put(annotation.value(), annotation);
             addCommandHandler(annotation.value(), method);
 
+            List<CommandParam> list = orderedCommandParams.computeIfAbsent(annotation, it -> new CopyOnWriteArrayList<>());
             Parameter[] parameters = method.getParameters();
             for (Parameter parameter : parameters) {
                 if (parameter.isAnnotationPresent(CommandParam.class)) {
                     CommandParam commandParam = parameter.getAnnotation(CommandParam.class);
-                    orderedCommandParams.computeIfAbsent(annotation, it -> new CopyOnWriteArrayList<>()).add(commandParam);
+                    list.add(commandParam);
                 }
             }
         }

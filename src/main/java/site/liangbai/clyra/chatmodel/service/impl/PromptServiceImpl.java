@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
 import site.liangbai.clyra.annotation.Command;
 import site.liangbai.clyra.annotation.CommandParam;
 import site.liangbai.clyra.bus.CommandBus;
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Service
 public class PromptServiceImpl implements PromptService {
     private final ObjectMapper objectMapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SnakeCaseStrategy.INSTANCE);
     @Resource

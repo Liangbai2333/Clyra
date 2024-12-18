@@ -28,7 +28,7 @@ public class TypeUtils {
         // 判断是否为包装类（包括Byte、Short、Integer、Long、Float、Double、Character、Boolean）
         return clazz == Byte.class || clazz == Short.class || clazz == Integer.class ||
                 clazz == Long.class || clazz == Float.class || clazz == Double.class ||
-                clazz == Character.class || clazz == Boolean.class;
+                clazz == Character.class || clazz == Boolean.class || clazz == String.class;
     }
 
     /**
