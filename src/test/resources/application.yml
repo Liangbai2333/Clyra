@@ -1,0 +1,6 @@
+langchain4j:
+  dashscope:
+    chat-model:
+      base-url:
+      api-key:
+      model-name:
