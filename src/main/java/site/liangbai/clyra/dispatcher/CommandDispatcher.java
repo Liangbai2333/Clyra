@@ -9,6 +9,7 @@ import site.liangbai.clyra.chatmodel.ChatModelEngine;
 import site.liangbai.clyra.di.InjectSourceProvider;
 import site.liangbai.clyra.dto.CommandStructure;
 import site.liangbai.clyra.registry.CommandHandlerResolver;
+import site.liangbai.clyra.utils.RegexUtils;
 import site.liangbai.clyra.utils.StringUtils;
 import site.liangbai.clyra.utils.TypeUtils;
 
@@ -73,7 +74,18 @@ public class CommandDispatcher {
                         throw new IllegalArgumentException("Missing argument: " + it.getName());
                     }
                     Class<?> type = it.getType();
-                    argsWithOrder.add(TypeUtils.convertToPrimitiveType(type, args.remove(0)));
+                    String arg = args.remove(0);
+                    Object o;
+                    try {
+                        o = TypeUtils.convertToPrimitiveType(type, arg);
+                    } catch (Exception ex1) {
+                        try {
+                            o = TypeUtils.convertToPrimitiveType(type, RegexUtils.fixParameter(arg));
+                        } catch (Exception ignored) {
+                            o = null;
+                        }
+                    }
+                    argsWithOrder.add(o);
                 });
 
         Map<String, Object> injectParameters = new HashMap<>();
@@ -81,7 +93,7 @@ public class CommandDispatcher {
 
         try {
             resolver.resolveCommand(new CommandStructure(node, argsWithOrder), injectParameters);
-        } catch (InvocationTargetException | IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
             log.error("resolve command failed", e);
             return DispatchResult.FAIL;
         }

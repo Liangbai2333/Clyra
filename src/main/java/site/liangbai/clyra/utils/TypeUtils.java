@@ -51,7 +51,7 @@ public class TypeUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T convertToPrimitiveType(Class<T> type, String value) {
+    public static <T> T convertToPrimitiveType(Class<T> type, String value) throws NumberFormatException {
         if (value == null) {
             throw new IllegalArgumentException("Value cannot be null");
         }

@@ -95,11 +95,11 @@ public class CommandHandlerResolver {
         nodes.put(node, method);
     }
 
-    public boolean resolveCommand(CommandStructure command, Map<String, Object> injectParameters) throws InvocationTargetException, IllegalAccessException {
+    public boolean resolveCommand(CommandStructure command, Map<String, Object> injectParameters) throws InvocationTargetException, IllegalAccessException, IllegalArgumentException {
         return invokeCommandMethod(command.getNode(), injectParameters, command.getData());
     }
 
-    private boolean invokeCommandMethod(String node, Map<String, Object> injectParameters, List<Object> argsWithOrder) throws InvocationTargetException, IllegalAccessException {
+    private boolean invokeCommandMethod(String node, Map<String, Object> injectParameters, List<Object> argsWithOrder) throws InvocationTargetException, IllegalAccessException, IllegalArgumentException {
         if (!nodes.containsKey(node)) return false;
         Method method = nodes.get(node);
         Parameter[] parameters = method.getParameters();
