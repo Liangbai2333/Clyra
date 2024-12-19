@@ -131,6 +131,9 @@ public class CommandHandlerResolver {
             Object injectObject = argsWithOrder.remove(0);
             if (injectObject == null) {
                 log.warn("command {} args required but accept null: {}", node, parameter.getName());
+                if (type.isPrimitive()) {
+                    objects[i] = TypeUtils.getDefaultValue(type);
+                }
                 continue;
             }
             // 处理基础类型和包装类之间的匹配

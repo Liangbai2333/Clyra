@@ -39,15 +39,27 @@ public class CommandDispatcher {
     public DispatchResult dispatch(String command, Collection<InjectSourceProvider> injectSourceProviders, boolean isChatMode, boolean isOriginal) {
         if (isOriginal && command.startsWith(clyraProperties.getOriginalCommandPrefix())) {
             command = StringUtils.removePrefix(command, clyraProperties.getOriginalCommandPrefix());
+            if (command.isEmpty()) {
+                log.debug("empty command to execute");
+                return DispatchResult.INVALID;
+            }
         } else if (isChatMode && command.startsWith(clyraProperties.getChatModelCommandPrefix())) {
             command = StringUtils.removePrefix(command, clyraProperties.getChatModelCommandPrefix());
+            if (command.isEmpty()) {
+                log.debug("empty message to transform");
+                return DispatchResult.INVALID;
+            }
+            String textOriginal = command;
             command = chatModelEngine.transformCommand(command);
             if (command.equalsIgnoreCase("null")) {
+                log.debug("no command found by message: {}", textOriginal);
                 return DispatchResult.NOT_FOUND_COMMAND;
             } else if (command.equalsIgnoreCase("busy")) {
+                log.debug("executing too many commands at one time by message: {}", textOriginal);
                 return DispatchResult.BUSY;
             }
         } else {
+            log.debug("invalid command format: {}", command);
             return DispatchResult.INVALID;
         }
 
@@ -57,11 +69,13 @@ public class CommandDispatcher {
     private DispatchResult internalDispatch(String originalCommand, Collection<InjectSourceProvider> injectSourceProviders) {
         CommandHandlerResolver resolver = CommandBus.matchCommandWithAllArgs(originalCommand);
         if (resolver == null) {
+            log.debug("a command with a suspected conversion error was encountered： {}", originalCommand);
             return DispatchResult.NOT_FOUND_COMMAND;
         }
         String argsWithNode = StringUtils.trimStart(StringUtils.removePrefix(originalCommand, resolver.getCommandAnno().value()));
         String node = resolver.parseNode(argsWithNode); // TODO ROOT NODE
         if (node == null) {
+            log.debug("a command with a suspected conversion error was encountered： {}", originalCommand);
             return DispatchResult.NOT_FOUND_NODE;
         }
         List<String> args = new ArrayList<>(Arrays.asList(StringUtils.trimStart(StringUtils.removePrefix(argsWithNode, node)).split(" ")));
@@ -71,7 +85,8 @@ public class CommandDispatcher {
                 .filter(it -> it.isAnnotationPresent(CommandParam.class))
                 .forEach(it -> {
                     if (args.isEmpty()) {
-                        throw new IllegalArgumentException("Missing argument: " + it.getName());
+                        log.warn("missing argument: {}", it.getName());
+                        return;
                     }
                     Class<?> type = it.getType();
                     String arg = args.remove(0);
@@ -79,9 +94,12 @@ public class CommandDispatcher {
                     try {
                         o = TypeUtils.convertToPrimitiveType(type, arg);
                     } catch (Exception ex1) {
+
                         try {
+                            log.debug("argument type convert failed: {}, try to fix by algorithm", arg);
                             o = TypeUtils.convertToPrimitiveType(type, RegexUtils.fixParameter(arg));
                         } catch (Exception ignored) {
+                            log.warn("unsupported argument ({}), try to raise an issue", arg);
                             o = null;
                         }
                     }
@@ -94,7 +112,7 @@ public class CommandDispatcher {
         try {
             resolver.resolveCommand(new CommandStructure(node, argsWithOrder), injectParameters);
         } catch (InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
-            log.error("resolve command failed", e);
+            log.warn("method invoke exception occurred: {}", e.getMessage());
             return DispatchResult.FAIL;
         }
 

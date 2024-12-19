@@ -1,6 +1,5 @@
 package site.liangbai.clyra.boot;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,31 +19,26 @@ import site.liangbai.clyra.registry.CommandRegistry;
 @EnableConfigurationProperties(ClyraProperties.class)
 public class ClyraConfiguration {
     @Bean
-    @ConditionalOnMissingBean
     public CommandDispatcher commandDispatcher() {
         return new CommandDispatcher();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ChatModelEngine chatModelEngine() {
         return new ChatModelEngine();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public PromptService promptService() {
         return new PromptServiceImpl();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ParamService paramService() {
         return new ParamServiceImpl();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ToolTemplate toolTemplate() {
         return new ToolTemplate();
     }

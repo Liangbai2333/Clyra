@@ -99,4 +99,26 @@ public class TypeUtils {
             throw new IllegalArgumentException("Unsupported type: " + type.getName());
         }
     }
+
+    public static Object getDefaultValue(Class<?> type) {
+        if (type == boolean.class) {
+            return false;
+        } else if (type == byte.class) {
+            return (byte) 0;
+        } else if (type == char.class) {
+            return '\u0000';  // 空字符
+        } else if (type == short.class) {
+            return (short) 0;
+        } else if (type == int.class) {
+            return 0;
+        } else if (type == long.class) {
+            return 0L;
+        } else if (type == float.class) {
+            return 0.0f;
+        } else if (type == double.class) {
+            return 0.0;
+        } else {
+            return null;  // 对象类型的默认值为 null
+        }
+    }
 }
